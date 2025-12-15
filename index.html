@@ -31,6 +31,8 @@
 
         html {
             scroll-behavior: smooth;
+            overflow-x: hidden;
+            width: 100%;
         }
 
         body {
@@ -43,6 +45,7 @@
             line-height: 1.7;
             overflow-x: hidden;
             width: 100%;
+            max-width: 100vw;
         }
 
         /* --- Navigation --- */
@@ -118,6 +121,13 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 2rem;
+        }
+
+        @media (max-width: 600px) {
+            main {
+                padding: 0 1rem;
+                overflow-x: hidden;
+            }
         }
 
         section {
@@ -355,6 +365,13 @@
             transform: perspective(1000px) rotateY(-2deg);
             transition: transform 0.5s ease;
             max-width: 100%;
+        }
+        
+        @media (max-width: 768px) {
+            .code-window {
+                transform: none !important;
+                margin: 1rem 0;
+            }
         }
         
         .code-window:hover {
