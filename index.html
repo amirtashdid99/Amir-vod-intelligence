@@ -220,6 +220,10 @@
             margin-top: 3rem;
             width: 100%;
         }
+        
+        .grid > * {
+            min-width: 0;
+        }
 
         .hero-grid {
             display: grid;
@@ -235,13 +239,15 @@
             }
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
             .hero-grid {
                 grid-template-columns: 1fr;
             }
             
             .grid {
                 grid-template-columns: 1fr !important;
+                display: flex;
+                flex-direction: column;
             }
 
             .span-2 {
@@ -761,11 +767,19 @@
             gap: 2rem;
             align-items: center;
         }
+        
+        .responsive-grid-2 > * {
+            min-width: 0;
+        }
 
         .responsive-grid-reverse {
             display: grid;
             grid-template-columns: 1fr 1.5fr;
             gap: 2rem;
+        }
+        
+        .responsive-grid-reverse > * {
+            min-width: 0;
         }
 
         .stats-grid {
@@ -1117,7 +1131,7 @@ df['anomaly'] = iso.fit_predict(features)</code></pre>
                 </div>
                 <div class="card">
                     <h4 style="color: #fff;">Global vs Local Taste Gap</h4>
-                    <p>Shows like <em>3%</em> have massive gaps between Local (<6.0) and Global (>7.0) ratings due to cultural mismatch.</p>
+                    <p>Shows like the Brazilian sci-fi series <em>3%</em> have massive gaps between Local (<6.0) and Global (>7.0) ratings due to cultural mismatch.</p>
                     <div id="chart-taste" style="min-height: 300px;"></div>
                 </div>
                 <div class="card span-2">
