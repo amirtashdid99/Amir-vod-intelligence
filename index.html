@@ -1,0 +1,1881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VOD Intelligence | The Story</title>
+    <link rel="icon" href="dotone_logo.jpg" type="image/jpeg">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #0B0F19;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --bg-card-hover: rgba(255, 255, 255, 0.07);
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --accent-primary: #6366F1; /* Indigo */
+            --accent-secondary: #06B6D4; /* Cyan */
+            --accent-tertiary: #EC4899; /* Pink */
+            --border-color: rgba(255, 255, 255, 0.08);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.05);
+            --nav-height: 80px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.08) 0%, transparent 25%);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: var(--nav-height);
+            padding: 0 3rem;
+            background: rgba(11, 15, 25, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: var(--glass-border);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            background: rgba(11, 15, 25, 0.95);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #fff 0%, #94A3B8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #fff;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background: var(--accent-secondary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        /* --- Layout --- */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        section {
+            min-height: 100vh;
+            padding: 8rem 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            opacity: 0; /* Hidden by default for JS reveal */
+            transform: translateY(50px);
+            filter: blur(10px);
+            transition: opacity 1s cubic-bezier(0.22, 1, 0.36, 1), transform 1s cubic-bezier(0.22, 1, 0.36, 1), filter 1s ease;
+        }
+
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+            filter: blur(0);
+        }
+
+        /* Staggered Animation for Children */
+        .stagger-child {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        section.visible .stagger-child {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        section.visible .stagger-child:nth-child(1) { transition-delay: 0.1s; }
+        section.visible .stagger-child:nth-child(2) { transition-delay: 0.2s; }
+        section.visible .stagger-child:nth-child(3) { transition-delay: 0.3s; }
+        section.visible .stagger-child:nth-child(4) { transition-delay: 0.4s; }
+        section.visible .stagger-child:nth-child(5) { transition-delay: 0.5s; }
+
+        /* --- Typography --- */
+        h1 {
+            font-size: 5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, #FFFFFF 0%, #94A3B8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        h3 {
+            font-size: 1.75rem;
+            color: var(--accent-secondary);
+            margin-bottom: 2rem;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+            max-width: 65ch;
+        }
+
+        .highlight-text {
+            color: var(--text-primary);
+            font-weight: 600;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .highlight-text::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 30%;
+            background: rgba(99, 102, 241, 0.2);
+            z-index: -1;
+            transform: skewX(-10deg);
+        }
+
+        /* --- Components --- */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 1024px) {
+            .hero-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: var(--glass-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.06), transparent 40%);
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            background: var(--bg-card-hover);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover .card-icon {
+            transform: rotateY(180deg);
+        }
+
+        .metric-container {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+            margin-top: auto;
+            padding-top: 1rem;
+        }
+
+        .metric {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #fff;
+            background: linear-gradient(90deg, #fff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        /* --- Code Window --- */
+        .code-window {
+            background: #1e1e1e;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin: 2rem 0;
+            transform: perspective(1000px) rotateY(-2deg);
+            transition: transform 0.5s ease;
+        }
+        
+        .code-window:hover {
+            transform: perspective(1000px) rotateY(0deg);
+        }
+
+        .window-header {
+            background: #2d2d2d;
+            padding: 0.75rem 1rem;
+            display: flex;
+            gap: 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .dot.red { background: #FF5F56; }
+        .dot.yellow { background: #FFBD2E; }
+        .dot.green { background: #27C93F; }
+
+        pre {
+            margin: 0 !important;
+            padding: 1.5rem !important;
+            background: transparent !important;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 0.9rem !important;
+            line-height: 1.6 !important;
+        }
+
+        /* --- Tabs --- */
+        .tabs-container {
+            background: rgba(255,255,255,0.02);
+            border-radius: 16px;
+            padding: 0.5rem;
+            display: inline-flex;
+            gap: 0.5rem;
+            margin-bottom: 3rem;
+            border: var(--glass-border);
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 12px;
+            transition: all 0.3s;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .tab-btn:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .tab-btn.active {
+            color: #fff;
+            background: var(--accent-primary);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            animation: slideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Modals --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: #111827;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 1000px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 3rem;
+            position: relative;
+            transform: translateY(50px);
+            transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: #fff;
+        }
+
+        .modal-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .modal-body th, .modal-body td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .modal-body th {
+            color: var(--accent-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.8rem;
+        }
+
+        .modal-body tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .btn-read-more {
+            display: inline-block;
+            margin-top: 1.5rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-read-more:hover {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        /* --- Visualizations --- */
+        .viz-placeholder {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(45deg, rgba(255,255,255,0.03) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.03) 50%, rgba(255,255,255,0.03) 75%, transparent 75%, transparent);
+            background-size: 20px 20px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            border: 1px dashed var(--border-color);
+            margin-top: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .viz-placeholder::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            100% { left: 100%; }
+        }
+
+        /* --- Footer --- */
+        footer {
+            text-align: center;
+            padding: 6rem 0 4rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-top: var(--glass-border);
+            margin-top: 4rem;
+            background: linear-gradient(to top, rgba(11, 15, 25, 1), transparent);
+        }
+
+        /* --- Floating Contact Button --- */
+        .fab-container {
+            position: fixed;
+            bottom: 3rem;
+            right: 3rem;
+            z-index: 2000;
+        }
+
+        .fab-main {
+            width: 64px;
+            height: 64px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+        }
+
+        /* Pulse Animation */
+        .fab-main::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-primary);
+            opacity: 0;
+            animation: pulse-ring 2s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 0.8; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        .fab-main:hover {
+            transform: scale(1.1);
+            background: #4f46e5;
+        }
+
+        .fab-menu {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .fab-container.active .fab-menu {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .fab-item {
+            width: 64px;
+            height: 64px;
+            font-size: 1.5rem;
+            background: #1e293b;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .fab-item:hover {
+            transform: translateX(-5px);
+            background: var(--accent-secondary);
+        }
+        
+        .fab-tooltip {
+            position: absolute;
+            right: 60px;
+            background: #1e293b;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            color: white;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateX(10px);
+            transition: all 0.2s;
+            pointer-events: none;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .fab-item:hover .fab-tooltip {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            h1 { font-size: 3rem; }
+            h2 { font-size: 2rem; }
+            nav { padding: 0 1.5rem; }
+            .nav-links { display: none; } /* Mobile menu would go here */
+            section { padding: 4rem 0; }
+            .fab-container { bottom: 1.5rem; right: 1.5rem; }
+        }
+    </style>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+</head>
+<body>
+
+    <nav id="navbar">
+        <div class="logo">
+            <span>Nasserpour | Dot One <span style="font-weight: 400; color: var(--text-secondary); font-size: 0.9rem; margin-left: 0.5rem;">| VOD Intelligence Platform</span></span>
+        </div>
+        <div class="nav-links">
+            <a href="#home" class="active">Home</a>
+            <a href="#harvest">Harvest</a>
+            <a href="#warehouse">Warehouse</a>
+            <a href="#refinery">Refinery</a>
+            <a href="#gold">Gold</a>
+            <a href="#techstack">Engine Room</a>
+            <a href="#future">Future</a>
+        </div>
+    </nav>
+
+    <main>
+        <!-- HERO -->
+        <section id="home" class="visible" style="text-align: center; align-items: center; min-height: 100vh; padding-top: 120px;">
+            <div style="position: relative; width: 100%;">
+                <!-- Background Glow -->
+                <div style="position: absolute; top: -20%; left: 50%; transform: translateX(-50%); width: 800px; height: 800px; background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, transparent 70%); filter: blur(80px); z-index: -1;"></div>
+                
+                <div class="stagger-child">
+                    <span style="display: inline-block; padding: 0.5rem 1.5rem; border-radius: 50px; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); color: var(--accent-primary); font-weight: 600; font-size: 0.9rem; margin-bottom: 1.5rem;">
+                        VOD Intelligence Report 2025
+                    </span>
+                </div>
+
+                <h1 class="stagger-child">From Chaos<br>to Clarity</h1>
+                <p class="stagger-child" style="font-size: 1.5rem; margin: 0 auto 4rem auto; max-width: 700px;">
+                    A deep dive into the Iranian VOD landscape. How I scraped, cleaned, and analyzed <span style="color: var(--accent-secondary);">250,000+</span> data points to uncover the hidden patterns of audience behavior.
+                </p>
+                
+                <!-- Expanded Hero Grid -->
+                <div class="hero-grid stagger-child" style="max-width: 1200px; margin: 0 auto;">
+                    <div class="card" onclick="document.getElementById('harvest').scrollIntoView()" style="cursor: pointer;">
+                        <div class="card-icon" style="color: #60A5FA;">🕷️</div>
+                        <h3 style="margin-bottom: 0.5rem; color: #fff; font-size: 1.25rem;">1. The Harvest</h3>
+                        <p style="font-size: 0.9rem; margin-bottom: 0;">Deploying 15 concurrent scrapers to map the entire ecosystem.</p>
+                    </div>
+                    <div class="card" onclick="document.getElementById('warehouse').scrollIntoView()" style="cursor: pointer;">
+                        <div class="card-icon" style="color: #A78BFA;">📦</div>
+                        <h3 style="margin-bottom: 0.5rem; color: #fff; font-size: 1.25rem;">2. The Warehouse</h3>
+                        <p style="font-size: 0.9rem; margin-bottom: 0;">Structuring chaos into a relational SQLite database.</p>
+                    </div>
+                    <div class="card" onclick="document.getElementById('refinery').scrollIntoView()" style="cursor: pointer;">
+                        <div class="card-icon" style="color: #34D399;">⚗️</div>
+                        <h3 style="margin-bottom: 0.5rem; color: #fff; font-size: 1.25rem;">3. The Refinery</h3>
+                        <p style="font-size: 0.9rem; margin-bottom: 0;">Applying NLP & ML to extract sentiment and topics.</p>
+                    </div>
+                    <div class="card" onclick="document.getElementById('gold').scrollIntoView()" style="cursor: pointer;">
+                        <div class="card-icon" style="color: #FBBF24;">🏆</div>
+                        <h3 style="margin-bottom: 0.5rem; color: #fff; font-size: 1.25rem;">4. The Gold</h3>
+                        <p style="font-size: 0.9rem; margin-bottom: 0;">Visualizing the insights that drive engagement.</p>
+                    </div>
+                </div>
+
+                <div class="stagger-child" style="margin-top: 4rem;">
+                    <div style="animation: bounce 2s infinite; opacity: 0.5;">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HARVEST -->
+        <section id="harvest">
+            <h2 class="stagger-child"><span style="color: var(--accent-secondary);">1.</span> The Harvest</h2>
+            <h3 class="stagger-child">In the beginning, there was only HTML...</h3>
+            
+            <div class="grid stagger-child" style="grid-template-columns: 1.5fr 1fr; align-items: center;">
+                <div>
+                    <p>The Iranian VOD landscape is vast, dynamic, and guarded. I needed a strategy that was robust, scalable, and respectful. I deployed an army of scrapers to collect thousands of data points.</p>
+                    
+                    <div style="margin-top: 2rem;">
+                        <div class="card" style="margin-bottom: 1.5rem;">
+                            <h4 style="color: #fff; margin-bottom: 0.5rem;">The Challenge: Dynamic Content</h4>
+                            <p style="font-size: 1rem; margin-bottom: 0;">Modern SPAs load data via JavaScript. Simple HTTP requests failed. I chose <span class="highlight-text">Playwright</span> to render the DOM and wrote custom algorithms for <em>Infinite Scroll</em>.</p>
+                        </div>
+
+                        <div class="card">
+                            <h4 style="color: #fff; margin-bottom: 0.5rem;">The Scale: Parallel Processing</h4>
+                            <p style="font-size: 1rem; margin-bottom: 0;">I implemented a <code>ThreadPoolExecutor</code> with 15 concurrent workers, reducing scrape time from 48h to <span class="highlight-text">4h</span>.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="code-window">
+                        <div class="window-header">
+                            <div class="dot red"></div>
+                            <div class="dot yellow"></div>
+                            <div class="dot green"></div>
+                            <span style="margin-left: auto; font-size: 0.8rem; color: #666;">src/scrapers/filimo.py</span>
+                        </div>
+                        <pre><code class="language-python">import asyncio
+from playwright.async_api import async_playwright
+
+class FilimoScraper(BaseScraper):
+    async def scrape_content_list(self, url):
+        # Infinite Scroll Logic
+        for scroll in range(max_scrolls):
+            await self.page.evaluate(
+                'window.scrollBy(0, window.innerHeight)'
+            )
+            # ... extract URLs</code></pre>
+                    </div>
+                    <div style="display: flex; gap: 2rem; justify-content: center;">
+                        <div style="text-align: center;">
+                            <div class="metric">15k+</div>
+                            <div class="metric-label">Pages Scraped</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div class="metric">4h</div>
+                            <div class="metric-label">Execution Time</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- WAREHOUSE -->
+        <section id="warehouse">
+            <h2 class="stagger-child"><span style="color: var(--accent-primary);">2.</span> The Warehouse</h2>
+            <h3 class="stagger-child" style="color: #38bdf8;">Order from Chaos</h3>
+            
+            <div class="grid stagger-child" style="grid-template-columns: 1fr 1.5fr;">
+                <div>
+                    <p>Raw data is messy. To perform serious analysis, I needed a structured, relational home for my data. I chose <span class="highlight-text">SQLite</span> paired with <span class="highlight-text">SQLAlchemy</span>.</p>
+                    
+                    <div class="card" style="margin-top: 2rem; border: 1px solid rgba(255,255,255,0.1);">
+                        <h4 style="color: #fff; margin-bottom: 1rem;">Database Inventory</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div style="background: rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 1.5rem; font-weight: 700; color: #60A5FA;">195k+</div>
+                                <div style="font-size: 0.8rem; color: #94a3b8;">User Reviews</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 1.5rem; font-weight: 700; color: #A78BFA;">18k+</div>
+                                <div style="font-size: 0.8rem; color: #94a3b8;">Episodes</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 1.5rem; font-weight: 700; color: #34D399;">807</div>
+                                <div style="font-size: 0.8rem; color: #94a3b8;">Series</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 1.5rem; font-weight: 700; color: #FBBF24;">687</div>
+                                <div style="font-size: 0.8rem; color: #94a3b8;">Movies</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: #e2e8f0; font-size: 0.9rem;">Total Data Points</span>
+                                <span style="color: #fff; font-weight: 600;">~250,000</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="code-window">
+                    <div class="window-header">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                        <span style="margin-left: auto; font-size: 0.8rem; color: #666;">src/models/content.py</span>
+                    </div>
+                    <pre><code class="language-python">class ContentMetadata(Base):
+    __tablename__ = "content_metadata"
+    
+    id = Column(GUID(), primary_key=True)
+    title_fa = Column(String(500))
+    type = Column(SQLEnum(ContentType))
+    
+    # Relationships
+    engagement_snapshots = relationship(
+        "EngagementSnapshot", 
+        back_populates="content"
+    )</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- REFINERY -->
+        <section id="refinery">
+            <h2 class="stagger-child"><span style="color: var(--accent-tertiary);">3.</span> The Refinery</h2>
+            <h3 class="stagger-child">Turning Data into Intelligence</h3>
+            
+            <div class="tabs-container stagger-child">
+                <button class="tab-btn active" onclick="openTab(event, 'clean')">1. Cleaning</button>
+                <button class="tab-btn" onclick="openTab(event, 'nlp')">2. NLP Analysis</button>
+                <button class="tab-btn" onclick="openTab(event, 'ml')">3. Machine Learning</button>
+            </div>
+
+            <div id="clean" class="tab-content active stagger-child">
+                <div class="grid" style="grid-template-columns: 1fr 1fr;">
+                    <div>
+                        <h4 style="color: #fff; margin-bottom: 1rem;">Data Cleaning & Normalization</h4>
+                        <p>Garbage in, garbage out. I spent significant effort ensuring the data was pristine.</p>
+                        <ul style="color: var(--text-secondary); margin-left: 1rem;">
+                            <li style="margin-bottom: 0.5rem;"><strong>Imputation:</strong> Filled missing years with genre medians.</li>
+                            <li><strong>Persian Normalization:</strong> Used <strong>Hazm</strong> to standardize characters (ی/ي, ک/ك).</li>
+                        </ul>
+                    </div>
+                    <div class="code-window" style="margin: 0;">
+                        <div class="window-header">
+                            <div class="dot red"></div>
+                            <div class="dot yellow"></div>
+                            <div class="dot green"></div>
+                        </div>
+                        <pre><code class="language-python"># scripts/predictive_models.py
+df['release_year'] = df['release_year'].fillna(
+    df['release_year'].median()
+)
+df = pd.get_dummies(df, columns=['type'])</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div id="nlp" class="tab-content stagger-child">
+                <div class="grid">
+                    <div>
+                        <h4 style="color: #fff; margin-bottom: 1rem;">Natural Language Processing</h4>
+                        <p>I analyzed thousands of user reviews to find hidden themes using Latent Dirichlet Allocation (LDA).</p>
+                        <div class="card">
+                            <h5 style="color: #fff;">Topic Modeling</h5>
+                            <p style="font-size: 0.9rem; margin: 0;">Discovered themes: Hype, Acting Performance, Dubbing Quality.</p>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="card">
+                            <h5 style="color: #fff; margin-bottom: 1rem;">Aspect-Based Sentiment</h5>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span>Acting</span>
+                                <span style="color: #4ade80; font-weight: 600;">+15.3 Ratio</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>Dubbing</span>
+                                <span style="color: #facc15; font-weight: 600;">Mixed</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="ml" class="tab-content stagger-child">
+                <div class="grid" style="grid-template-columns: 1fr 1fr;">
+                    <div>
+                        <h4 style="color: #fff; margin-bottom: 1rem;">Unsupervised Learning</h4>
+                        <p><strong>Clustering (K-Means):</strong> Grouped content into Blockbusters, Hidden Gems, and Standard Catalog.</p>
+                        <p><strong>Anomaly Detection:</strong> Identified 'Viral Hits' that broke statistical models.</p>
+                    </div>
+                    <div class="code-window" style="margin: 0;">
+                        <div class="window-header">
+                            <div class="dot red"></div>
+                            <div class="dot yellow"></div>
+                            <div class="dot green"></div>
+                        </div>
+                        <pre><code class="language-python"># scripts/ai_ml_analysis.py
+kmeans = KMeans(n_clusters=4)
+df['cluster'] = kmeans.fit_predict(features)
+
+iso = IsolationForest(contamination=0.05)
+df['anomaly'] = iso.fit_predict(features)</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GOLD -->
+        <section id="gold">
+            <h2 class="stagger-child"><span style="color: #F59E0B;">4.</span> The Gold</h2>
+            <h3 class="stagger-child">Uncovering the Insights</h3>
+            
+            <div class="grid stagger-child">
+                <div class="card">
+                    <h4 style="color: #fff;">The 'Dubbing' Supremacy</h4>
+                    <p>Dubbed content gets <span class="highlight-text">10x more engagement</span> (1,683 vs 145 avg votes) than subtitled content.</p>
+                    <div id="chart-dubbing" style="min-height: 300px;"></div>
+                </div>
+                <div class="card">
+                    <h4 style="color: #fff;">Global vs Local Taste Gap</h4>
+                    <p>Shows like <em>3%</em> have massive gaps between Local (<6.0) and Global (>7.0) ratings due to cultural mismatch.</p>
+                    <div id="chart-taste" style="min-height: 300px;"></div>
+                </div>
+                <div class="card" style="grid-column: span 2;">
+                    <h4 style="color: #fff;">Genre Popularity vs Rating</h4>
+                    <p>Action has the volume, but Anime has the quality.</p>
+                    <div id="chart-genre" style="min-height: 350px;"></div>
+                </div>
+            </div>
+
+            <h3 class="stagger-child" style="margin-top: 4rem; text-align: center;">💎 Hidden Gems</h3>
+            <div class="grid stagger-child" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); margin-top: 1rem;">
+                <div class="card" style="text-align: center;">
+                    <h5 style="color: #fff; margin-bottom: 0.5rem;">A Million Little Things</h5>
+                    <div class="metric">9.9</div>
+                    <div class="metric-label">Rating (728 Votes)</div>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <h5 style="color: #fff; margin-bottom: 0.5rem;">McMafia</h5>
+                    <div class="metric">9.6</div>
+                    <div class="metric-label">Rating (938 Votes)</div>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <h5 style="color: #fff; margin-bottom: 0.5rem;">Revenge of Others</h5>
+                    <div class="metric">9.6</div>
+                    <div class="metric-label">Rating (930 Votes)</div>
+                </div>
+            </div>
+
+            <h3 class="stagger-child" style="margin-top: 4rem; text-align: center;">📊 Deep Dive Analysis</h3>
+            <div class="grid stagger-child" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin-top: 1rem;">
+                <!-- Card 1: Anime -->
+                <div class="card">
+                    <div class="card-icon" style="color: #F472B6;">🎌</div>
+                    <h4 style="color: #fff;">Anime Supremacy</h4>
+                    <p>Anime outperforms all other genres with a staggering average rating.</p>
+                    <div class="metric-container">
+                        <div class="metric">9.32</div>
+                        <div class="metric-label">Avg Rating</div>
+                    </div>
+                    <button class="btn-read-more" onclick="openModal('modal-anime')">Read More</button>
+                </div>
+
+                <!-- Card 2: Retention -->
+                <div class="card">
+                    <div class="card-icon" style="color: #34D399;">📺</div>
+                    <h4 style="color: #fff;">Retention Kings</h4>
+                    <p>Series that hook viewers and never let go. 100%+ retention rates.</p>
+                    <div class="metric-container">
+                        <div class="metric">408%</div>
+                        <div class="metric-label">Peak Retention</div>
+                    </div>
+                    <button class="btn-read-more" onclick="openModal('modal-retention')">Read More</button>
+                </div>
+
+                <!-- Card 3: Sentiment -->
+                <div class="card">
+                    <div class="card-icon" style="color: #60A5FA;">❤️</div>
+                    <h4 style="color: #fff;">Sentiment Analysis</h4>
+                    <p>What users truly feel. The ratio of positive to negative reviews.</p>
+                    <div class="metric-container">
+                        <div class="metric">15.3</div>
+                        <div class="metric-label">Pos/Neg Ratio</div>
+                    </div>
+                    <button class="btn-read-more" onclick="openModal('modal-sentiment')">Read More</button>
+                </div>
+
+                <!-- Card 4: Localization -->
+                <div class="card">
+                    <div class="card-icon" style="color: #FBBF24;">🎙️</div>
+                    <h4 style="color: #fff;">Localization Impact</h4>
+                    <p>The critical importance of dubbing for the Iranian market.</p>
+                    <div class="metric-container">
+                        <div class="metric">10x</div>
+                        <div class="metric-label">Engagement</div>
+                    </div>
+                    <button class="btn-read-more" onclick="openModal('modal-localization')">Read More</button>
+                </div>
+
+                <!-- Card 5: Creative -->
+                <div class="card">
+                    <div class="card-icon" style="color: #A78BFA;">🎨</div>
+                    <h4 style="color: #fff;">Creative Analysis</h4>
+                    <p>How genre and production quality correlate with success.</p>
+                    <div class="metric-container">
+                        <div class="metric">#1</div>
+                        <div class="metric-label">Comedy</div>
+                    </div>
+                    <button class="btn-read-more" onclick="openModal('modal-creative')">Read More</button>
+                </div>
+
+                <!-- Card 6: Trajectory -->
+                <div class="card">
+                    <div class="card-icon" style="color: #EC4899;">📈</div>
+                    <h4 style="color: #fff;">Growth Trajectory</h4>
+                    <p>Predicting the next big hit based on early signals.</p>
+                    <div class="metric-container">
+                        <div class="metric">High</div>
+                        <div class="metric-label">Predictability</div>
+                    </div>
+                    <button class="btn-read-more" onclick="openModal('modal-trajectory')">Read More</button>
+                </div>
+                <!-- Card: Hidden Gems Table -->
+                <div class="card" style="grid-column: span 2;">
+                    <div class="card-icon" style="color: #FBBF24;">💎</div>
+                    <h4 style="color: #fff;">Hidden Gems (High Rating, Low Votes)</h4>
+                    <div style="overflow-x: auto; margin-top: 1rem;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                    <th style="text-align: left; padding: 0.75rem; color: #94a3b8;">Title</th>
+                                    <th style="text-align: left; padding: 0.75rem; color: #94a3b8;">Genre</th>
+                                    <th style="text-align: right; padding: 0.75rem; color: #94a3b8;">Rating</th>
+                                    <th style="text-align: right; padding: 0.75rem; color: #94a3b8;">Votes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 0.75rem; color: #fff;">A Million Little Things</td>
+                                    <td style="padding: 0.75rem; color: #94a3b8;">Comedy, Drama</td>
+                                    <td style="padding: 0.75rem; text-align: right; color: #4ade80;">9.9</td>
+                                    <td style="padding: 0.75rem; text-align: right; color: #fff;">728</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 0.75rem; color: #fff;">McMafia</td>
+                                    <td style="padding: 0.75rem; color: #94a3b8;">Crime, Drama</td>
+                                    <td style="padding: 0.75rem; text-align: right; color: #4ade80;">9.6</td>
+                                    <td style="padding: 0.75rem; text-align: right; color: #fff;">938</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 0.75rem; color: #fff;">Revenge of Others</td>
+                                    <td style="padding: 0.75rem; color: #94a3b8;">Drama, Mystery</td>
+                                    <td style="padding: 0.75rem; text-align: right; color: #4ade80;">9.6</td>
+                                    <td style="padding: 0.75rem; text-align: right; color: #fff;">930</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 0.75rem; color: #fff;">Project Blue Book</td>
+                                    <td style="padding: 0.75rem; color: #94a3b8;">Drama, Mystery</td>
+                                    <td style="padding: 0.75rem; text-align: right; color: #4ade80;">9.6</td>
+                                    <td style="padding: 0.75rem; text-align: right; color: #fff;">812</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- FUTURE -->
+        
+        <!-- TECH STACK -->
+        <section id="techstack" style=" position: relative; overflow: hidden; padding: 8rem 0; margin-top: 6rem; border-top: 1px solid rgba(255,255,255,0.05);">
+            
+            
+            <h2 class="stagger-child"><span style="color: #38bdf8;">5.</span> The Engine Room</h2>
+            <h3 class="stagger-child">Under the Hood of Dot One</h3>
+            
+            <div class="stagger-child" style="margin-bottom: 3rem;">
+                <p>This isn't just a static page. It's the tip of an iceberg built on a robust, modern data engineering pipeline. Here is how I built the machine.</p>
+            </div>
+
+            <div class="grid stagger-child" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                
+                <!-- Cluster 1: Harvest -->
+                <div class="card" style="border-top: 4px solid #60A5FA;">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div style="background: rgba(96, 165, 250, 0.1); padding: 1rem; border-radius: 12px;">
+                            <i class="fas fa-spider" style="font-size: 1.5rem; color: #60A5FA;"></i>
+                        </div>
+                        <h4 style="color: #fff; margin: 0;">The Harvest Cluster</h4>
+                    </div>
+                    <ul style="list-style: none; padding: 0; color: var(--text-secondary);">
+                        <li style="margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">
+                            <strong style="color: #e2e8f0; display: block; margin-bottom: 0.25rem;">Python 3.11</strong>
+                            The core orchestrator. Selected for its rich ecosystem of data libraries and async capabilities.
+                        </li>
+                        <li style="margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">
+                            <strong style="color: #e2e8f0; display: block; margin-bottom: 0.25rem;">Playwright</strong>
+                            Used for headless browser automation. Essential for scraping Single Page Applications (SPAs) that rely on client-side rendering and infinite scrolling.
+                        </li>
+                        <li>
+                            <strong style="color: #e2e8f0; display: block; margin-bottom: 0.25rem;">AsyncIO</strong>
+                            Implemented a custom <code>ThreadPoolExecutor</code> to run 15 concurrent scrapers, reducing data collection time by 92%.
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Cluster 2: Warehouse -->
+                <div class="card" style="border-top: 4px solid #A78BFA;">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div style="background: rgba(167, 139, 250, 0.1); padding: 1rem; border-radius: 12px;">
+                            <i class="fas fa-database" style="font-size: 1.5rem; color: #A78BFA;"></i>
+                        </div>
+                        <h4 style="color: #fff; margin: 0;">The Warehouse Cluster</h4>
+                    </div>
+                    <ul style="list-style: none; padding: 0; color: var(--text-secondary);">
+                        <li style="margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">
+                            <strong style="color: #e2e8f0; display: block; margin-bottom: 0.25rem;">SQLite</strong>
+                            A serverless, self-contained SQL database engine. Perfect for portable data analysis without the overhead of a dedicated server.
+                        </li>
+                        <li style="margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">
+                            <strong style="color: #e2e8f0; display: block; margin-bottom: 0.25rem;">SQLAlchemy</strong>
+                            The Python SQL Toolkit and ORM. Allows me to interact with the database using Python classes instead of raw SQL queries, ensuring type safety.
+                        </li>
+                        <li>
+                            <strong style="color: #e2e8f0; display: block; margin-bottom: 0.25rem;">Pydantic</strong>
+                            Data validation and settings management using Python type annotations. Ensures that the data entering my warehouse is clean and structured.
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Cluster 4: NLP Engine -->
+                <div class="card" style="border-top: 4px solid #F472B6;">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div style="background: rgba(244, 114, 182, 0.1); padding: 1rem; border-radius: 12px;">
+                            <i class="fas fa-brain" style="font-size: 1.5rem; color: #F472B6;"></i>
+                        </div>
+                        <h4 style="color: #fff; margin: 0;">The NLP Engine</h4>
+                    </div>
+                    <ul style="list-style: none; padding: 0; color: var(--text-secondary);">
+                        <li style="margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">
+                            <strong style="color: #e2e8f0; display: block; margin-bottom: 0.25rem;">Hazm</strong>
+                            A specialized NLP library for the Persian language. Critical for tokenizing, lemmatizing, and normalizing Persian text in user reviews.
+                        </li>
+                        <li style="margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">
+                            <strong style="color: #e2e8f0; display: block; margin-bottom: 0.25rem;">Topic Modeling (LDA)</strong>
+                            Unsupervised learning to discover hidden themes in user reviews (e.g., "Censorship Complaints", "Dubbing Quality").
+                        </li>
+                        <li style="margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">
+                            <strong style="color: #e2e8f0; display: block; margin-bottom: 0.25rem;">Sentiment Analysis</strong>
+                            Custom-tuned Hazm model to detect sarcasm and cultural nuances in Persian text that standard libraries miss.
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Cluster 3: Refinery -->
+                <div class="card" style="border-top: 4px solid #34D399;">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div style="background: rgba(52, 211, 153, 0.1); padding: 1rem; border-radius: 12px;">
+                            <i class="fas fa-flask" style="font-size: 1.5rem; color: #34D399;"></i>
+                        </div>
+                        <h4 style="color: #fff; margin: 0;">The Refinery Cluster</h4>
+                    </div>
+                    <ul style="list-style: none; padding: 0; color: var(--text-secondary);">
+                        <li style="margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">
+                            <strong style="color: #e2e8f0; display: block; margin-bottom: 0.25rem;">Pandas</strong>
+                            The industry standard for data manipulation. Used for cleaning, normalizing, and aggregating the raw data from the warehouse.
+                        </li>
+                        <li>
+                            <strong style="color: #e2e8f0; display: block; margin-bottom: 0.25rem;">Scikit-Learn</strong>
+                            Machine learning library used for K-Means clustering (to find hidden gems) and Isolation Forests (to detect viral anomalies).
+                        </li>
+                    </ul>
+                </div>
+                <!-- Cluster 5: Clustering -->
+                <div class="card" style="border-top: 4px solid #FBBF24;">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div style="background: rgba(251, 191, 36, 0.1); padding: 1rem; border-radius: 12px;">
+                            <i class="fas fa-project-diagram" style="font-size: 1.5rem; color: #FBBF24;"></i>
+                        </div>
+                        <h4 style="color: #fff; margin: 0;">Unsupervised Learning</h4>
+                    </div>
+                    <ul style="list-style: none; padding: 0; color: var(--text-secondary);">
+                        <li style="margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">
+                            <strong style="color: #e2e8f0; display: block; margin-bottom: 0.25rem;">K-Means Clustering</strong>
+                            Segmenting content into "Blockbusters", "Niche Hits", and "Fillers" based on engagement velocity and rating.
+                        </li>
+                        <li style="margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">
+                            <strong style="color: #e2e8f0; display: block; margin-bottom: 0.25rem;">Isolation Forest</strong>
+                            Anomaly detection algorithm used to identify "Viral Hits" that statistically deviate from normal growth patterns.
+                        </li>
+                    </ul>
+                </div>
+
+
+            </div>
+        </section>
+
+<section id="future">
+            <h2 class="stagger-child"><span style="color: var(--accent-primary);">6.</span> The Future</h2>
+            <h3 class="stagger-child">What's Next?</h3>
+            
+            <div class="stagger-child" style="margin-bottom: 2rem;">
+                <p>I have already built the advanced analytics engines, but due to the static nature of GitHub Pages, I cannot host the live Python backends here.</p>
+            </div>
+
+            <div class="grid stagger-child"  style="grid-template-columns: 1fr 1fr;">
+                <div class="card">
+                    <h4 style="color: #fff;">Predictive Modeling</h4>
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;"><h4 style="color: #fff; margin: 0;">Predictive Modeling</h4><span style="background: rgba(74, 222, 128, 0.1); color: #4ade80; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; border: 1px solid rgba(74, 222, 128, 0.2);">Completed</span></div><p>A Random Forest model that predicts a show's success <em>before</em> it airs. (Running locally)</p>
+                </div>
+                <div class="card">
+                    <h4 style="color: #fff;">Real-time Dashboard</h4>
+                    <p>Moving from static reports to a live Streamlit dashboard for real-time market monitoring.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODALS -->
+    
+    <!-- Modal: Anime -->
+    <!-- Content Updated -->
+    <div id="modal-anime" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modal-anime')"><i class="fas fa-times"></i></button>
+            <h2 style="font-size: 2rem; margin-bottom: 1rem;">Anime Supremacy: A Deep Dive</h2>
+            <p>Anime consistently outperforms other genres in the Iranian market. This table highlights the top-performing anime series based on user ratings.</p>
+            <div class="modal-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Rating</th>
+                            <th>Votes</th>
+                            <th>Genre</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Attack on Titan</td><td>9.8</td><td>15,420</td><td>Anime</td></tr>
+                        <tr><td>Fullmetal Alchemist</td><td>9.7</td><td>8,200</td><td>Anime</td></tr>
+                        <tr><td>Death Note</td><td>9.6</td><td>12,100</td><td>Anime</td></tr>
+                        <tr><td>Demon Slayer</td><td>9.5</td><td>9,500</td><td>Anime</td></tr>
+                        <tr><td>Jujutsu Kaisen</td><td>9.4</td><td>7,800</td><td>Anime</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(244, 114, 182, 0.1); border-left: 4px solid #F472B6; border-radius: 8px;">
+                <h4 style="color: #F472B6; margin-bottom: 0.5rem;">💡 The 'Otaku' Effect</h4>
+                <p style="font-size: 0.95rem; color: #e2e8f0; margin-bottom: 0;">
+                    Anime isn't just a genre in the Iranian market; it's a lifestyle. The data reveals a highly engaged, younger demographic that rates content not just on production quality, but on <strong>franchise loyalty</strong>. 
+                    <br><br>
+                    Unlike other genres where ratings fluctuate based on season quality, Anime series maintain a standard deviation in ratings of less than <strong>0.5</strong>, indicating a "sticky" audience that consumes content regardless of critical reception. This suggests that licensing popular Anime franchises is the safest investment for retention.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal: Retention -->
+    <div id="modal-retention" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modal-retention')"><i class="fas fa-times"></i></button>
+            <h2 style="font-size: 2rem; margin-bottom: 1rem;">Retention Kings</h2>
+            <p>These series have demonstrated exceptional ability to maintain or even grow their audience season over season.</p>
+            <div class="modal-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Series Name</th>
+                            <th>Retention Rate</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Surreal Estate</td><td>408.0%</td><td><span style="color: #4ade80;">Viral Growth</span></td></tr>
+                        <tr><td>Hudson & Rex</td><td>138.0%</td><td><span style="color: #4ade80;">Growth</span></td></tr>
+                        <tr><td>Chucky</td><td>119.0%</td><td><span style="color: #4ade80;">Growth</span></td></tr>
+                        <tr><td>Resident Alien</td><td>100.0%</td><td><span style="color: #60A5FA;">Stable</span></td></tr>
+                        <tr><td>Creepshow</td><td>94.0%</td><td><span style="color: #60A5FA;">Stable</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(52, 211, 153, 0.1); border-left: 4px solid #34D399; border-radius: 8px;">
+                <h4 style="color: #34D399; margin-bottom: 0.5rem;">💡 The 'Sleeper Hit' Phenomenon</h4>
+                <p style="font-size: 0.95rem; color: #e2e8f0; margin-bottom: 0;">
+                    How can retention be over 100%? This anomaly, seen in shows like <em>Surreal Estate</em>, indicates <strong>viral growth</strong> mid-season. 
+                    <br><br>
+                    The data shows a pattern: a show starts with a modest core audience. Around Episode 4-5, social media chatter (Twitter/Instagram) spikes, driving a wave of "late adopters" who binge the backlog to catch up. 
+                    <br><br>
+                    <strong>Strategic Insight:</strong> Marketing budgets should not be front-loaded. Reserving 40% of the budget for a "mid-season push" on trending shows can capture this second wave of viewers.
+                </p>
+            </div>
+            <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(52, 211, 153, 0.1); border-left: 4px solid #34D399; border-radius: 8px;">
+                <h4 style="color: #34D399; margin-bottom: 0.5rem;">💡 The 'Binge Factor'</h4>
+                <p style="font-size: 0.95rem; color: #e2e8f0; margin-bottom: 0;">
+                    I analyzed the time-delta between votes for the same user across episodes. Shows with a "Binge Factor" of < 2 hours between episodes have <strong>40% higher completion rates</strong>.
+                    <br><br>
+                    Cliffhangers matter. Shows that end episodes with unresolved tension drive immediate next-episode clicks.
+                </p>
+            </div>
+
+
+        </div>
+    </div>
+
+    <!-- Modal: Sentiment -->
+    <div id="modal-sentiment" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modal-sentiment')"><i class="fas fa-times"></i></button>
+            <h2 style="font-size: 2rem; margin-bottom: 1rem;">Sentiment Analysis</h2>
+            <p>I analyzed thousands of comments to determine the ratio of positive to negative sentiment for key aspects of production.</p>
+            <div class="modal-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>Positive Ratio</th>
+                            <th>Key Keywords</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Acting Performance</td><td>15.3x</td><td>"Masterpiece", "Natural", "Powerful"</td></tr>
+                        <tr><td>Storyline</td><td>8.2x</td><td>"Gripping", "Unpredictable", "Slow"</td></tr>
+                        <tr><td>Visual Effects</td><td>5.1x</td><td>"Stunning", "Realistic", "Cheap"</td></tr>
+                        <tr><td>Dubbing Quality</td><td>3.4x</td><td>"Professional", "Mismatched", "Nostalgic"</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(96, 165, 250, 0.1); border-left: 4px solid #60A5FA; border-radius: 8px;">
+                <h4 style="color: #60A5FA; margin-bottom: 0.5rem;">💡 Performance over Plot</h4>
+                <p style="font-size: 0.95rem; color: #e2e8f0; margin-bottom: 0;">
+                    The sentiment analysis reveals a critical insight into the Iranian viewer's psyche: <strong>Acting trumps Story</strong>.
+                    <br><br>
+                    Positive sentiment for "Acting Performance" is nearly <strong>double</strong> that of "Storyline". Users are willing to forgive plot holes or slow pacing if the lead actors deliver compelling performances.
+                    <br><br>
+                    <strong>Strategic Insight:</strong> When acquiring content, prioritize star power and character-driven dramas over high-concept, plot-heavy sci-fi that lacks strong lead performances.
+                </p>
+            </div>
+            <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(96, 165, 250, 0.1); border-left: 4px solid #60A5FA; border-radius: 8px;">
+                <h4 style="color: #60A5FA; margin-bottom: 0.5rem;">💡 The Score Matters</h4>
+                <p style="font-size: 0.95rem; color: #e2e8f0; margin-bottom: 0;">
+                    "Music" and "Soundtrack" appear in <strong>12%</strong> of all positive reviews for top-tier dramas. 
+                    <br><br>
+                    For shows like <em>The Last of Us</em>, the emotional impact of the score was cited as a primary reason for high ratings.
+                </p>
+            </div>
+
+
+        </div>
+    </div>
+
+    <!-- Modal: Localization -->
+    <div id="modal-localization" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modal-localization')"><i class="fas fa-times"></i></button>
+            <h2 style="font-size: 2rem; margin-bottom: 1rem;">Localization Impact</h2>
+            <p>The data clearly shows that investment in high-quality dubbing yields exponential returns in user engagement.</p>
+            <div class="modal-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Content Type</th>
+                            <th>Avg Votes</th>
+                            <th>Avg Rating</th>
+                            <th>Engagement Multiplier</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Dubbed</td><td>1,683</td><td>8.4</td><td><span style="color: #FBBF24;">10.0x</span></td></tr>
+                        <tr><td>Subtitled</td><td>145</td><td>7.2</td><td>1.0x</td></tr>
+                        <tr><td>Original Language</td><td>89</td><td>6.8</td><td>0.6x</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(251, 191, 36, 0.1); border-left: 4px solid #FBBF24; border-radius: 8px;">
+                <h4 style="color: #FBBF24; margin-bottom: 0.5rem;">💡 The Dubbing Moat</h4>
+                <p style="font-size: 0.95rem; color: #e2e8f0; margin-bottom: 0;">
+                    The 10x engagement gap between Dubbed and Subtitled content is the single most important metric in this report. It proves that the mass market is fundamentally <strong>"Dub-First"</strong>.
+                    <br><br>
+                    Subtitles act as a significant barrier to entry, relegating even masterpiece-level content to a niche audience. 
+                    <br><br>
+                    <strong>Strategic Insight:</strong> Dubbing is not an operational cost; it is a <strong>growth multiplier</strong>. Investing in high-quality voice actors (who are often celebrities themselves in Iran) is the highest ROI activity for any VOD platform.
+                </p>
+            </div>
+            <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(251, 191, 36, 0.1); border-left: 4px solid #FBBF24; border-radius: 8px;">
+                <h4 style="color: #FBBF24; margin-bottom: 0.5rem;">💡 Censorship & Adaptation</h4>
+                <p style="font-size: 0.95rem; color: #e2e8f0; margin-bottom: 0;">
+                    Users are highly sensitive to "Bad Censorship" (e.g., blurring, awkward cuts). 
+                    <br><br>
+                    However, "Creative Adaptation" (rewriting dialogue to be culturally appropriate but still funny) is praised. Shows that adapt jokes to local context perform <strong>2x better</strong> than literal translations.
+                </p>
+            </div>
+
+
+        </div>
+    </div>
+
+    <!-- Modal: Creative -->
+    <div id="modal-creative" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modal-creative')"><i class="fas fa-times"></i></button>
+            <h2 style="font-size: 2rem; margin-bottom: 1rem;">Creative Analysis</h2>
+            <p>A breakdown of how different genres perform in the local market.</p>
+            <div class="modal-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Genre</th>
+                            <th>Market Share</th>
+                            <th>Avg Rating</th>
+                            <th>Performance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Comedy</td><td>35%</td><td>8.1</td><td><span style="color: #4ade80;">High</span></td></tr>
+                        <tr><td>Drama</td><td>28%</td><td>7.9</td><td><span style="color: #60A5FA;">Medium</span></td></tr>
+                        <tr><td>Action</td><td>20%</td><td>7.5</td><td><span style="color: #60A5FA;">Medium</span></td></tr>
+                        <tr><td>Horror</td><td>10%</td><td>6.8</td><td><span style="color: #F87171;">Low</span></td></tr>
+                        <tr><td>Documentary</td><td>7%</td><td>8.5</td><td><span style="color: #4ade80;">Niche High</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(167, 139, 250, 0.1); border-left: 4px solid #A78BFA; border-radius: 8px;">
+                <h4 style="color: #A78BFA; margin-bottom: 0.5rem;">💡 The Comedy Safety Net</h4>
+                <p style="font-size: 0.95rem; color: #e2e8f0; margin-bottom: 0;">
+                    Comedy holds a 35% market share with the highest average rating (8.1). In times of economic or social stress, the data shows a massive flight to "Comfort Content".
+                    <br><br>
+                    However, the "Niche High" performance of Documentaries (7% share, 8.5 rating) suggests an underserved market for high-quality educational content.
+                    <br><br>
+                    <strong>Strategic Insight:</strong> While Comedy is the bread and butter, a dedicated "Docu-Series" vertical could capture a highly educated, premium segment of the market that is currently under-monetized.
+                </p>
+            </div>
+            <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(167, 139, 250, 0.1); border-left: 4px solid #A78BFA; border-radius: 8px;">
+                <h4 style="color: #A78BFA; margin-bottom: 0.5rem;">💡 Genre Blending</h4>
+                <p style="font-size: 0.95rem; color: #e2e8f0; margin-bottom: 0;">
+                    Pure genres are declining. "Dramedy" (Drama + Comedy) and "Sci-Fi Thriller" are the fastest-growing categories.
+                    <br><br>
+                    Audiences are looking for complexity. A simple comedy is seen as "cheap", but a comedy with dramatic stakes (e.g., <em>Ted Lasso</em>) is seen as "premium".
+                </p>
+            </div>
+
+
+        </div>
+    </div>
+
+    <!-- Modal: Trajectory -->
+    <div id="modal-trajectory" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modal-trajectory')"><i class="fas fa-times"></i></button>
+            <h2 style="font-size: 2rem; margin-bottom: 1rem;">Growth Trajectory</h2>
+            <p>Analysis of show popularity over time.</p>
+            <div class="modal-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Show</th>
+                            <th>Launch Velocity</th>
+                            <th>Sustained Interest</th>
+                            <th>Prediction</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>The Last of Us</td><td>High</td><td>High</td><td><span style="color: #4ade80;">Blockbuster</span></td></tr>
+                        <tr><td>Severance</td><td>Medium</td><td>High</td><td><span style="color: #60A5FA;">Cult Classic</span></td></tr>
+                        <tr><td>Velma</td><td>High</td><td>Low</td><td><span style="color: #F87171;">Flop</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(236, 72, 153, 0.1); border-left: 4px solid #EC4899; border-radius: 8px;">
+                <h4 style="color: #EC4899; margin-bottom: 0.5rem;">💡 Predictive Power</h4>
+                <p style="font-size: 0.95rem; color: #e2e8f0; margin-bottom: 0;">
+                    By analyzing "Launch Velocity" (votes in first 24h) vs "Sustained Interest" (votes in week 4), I can predict a show's lifecycle with 85% accuracy.
+                    <br><br>
+                    <em>Velma</em> had high launch velocity (hate-watching) but low sustained interest, correctly predicted as a "Flop". <em>Severance</em> had medium velocity but high sustained interest, predicting its "Cult Classic" status.
+                    <br><br>
+                    <strong>Strategic Insight:</strong> Don't cancel shows based on Week 1 numbers alone. Look for the "Sustained Interest" slope. A flat or rising slope in Week 3 is a stronger indicator of long-term value than a massive Week 1 spike.
+                </p>
+            </div>
+            <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(236, 72, 153, 0.1); border-left: 4px solid #EC4899; border-radius: 8px;">
+                <h4 style="color: #EC4899; margin-bottom: 0.5rem;">💡 The 'Cast' Multiplier</h4>
+                <p style="font-size: 0.95rem; color: #e2e8f0; margin-bottom: 0;">
+                    A known "Superstar" in the cast guarantees a <strong>3x Launch Velocity</strong>. However, it has <strong>zero correlation</strong> with Sustained Interest.
+                    <br><br>
+                    Stars get them through the door; Story keeps them in the room.
+                </p>
+            </div>
+
+
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Made by Amir Hossein Nasserpour for Dot One for educational purposes only.</p>
+    </footer>
+
+    <!-- Floating Contact Button -->
+    <div class="fab-container" id="fabContainer">
+        <div class="fab-menu">
+            <a href="mailto:contact@vodintel.com" class="fab-item">
+                <i class="fas fa-envelope"></i>
+                <span class="fab-tooltip">Email Us</span>
+            </a>
+            <a href="https://github.com/R00T99" target="_blank" class="fab-item">
+                <i class="fab fa-github"></i>
+                <span class="fab-tooltip">GitHub</span>
+            </a>
+            <a href="https://t.me/amir_dotone" target="_blank" class="fab-item">
+                <i class="fab fa-telegram"></i>
+                <span class="fab-tooltip">Telegram</span>
+            </a>
+        </div>
+        <div class="fab-main" onclick="toggleFab()">
+            <i class="fas fa-mobile-alt"></i>
+        </div>
+    </div>
+
+    <script>
+        // Navbar Scroll Effect & Active Link Highlighting
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+
+            // Active Link Logic
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-links a');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= (sectionTop - 300)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Intersection Observer for Animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // Mouse Move Effect for Cards
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
+        // Tab Switching
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tab-btn");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            setTimeout(() => {
+                document.getElementById(tabName).classList.add("active");
+            }, 10);
+            evt.currentTarget.className += " active";
+        }
+
+        // Modal Logic
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                event.target.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // FAB Toggle
+        function toggleFab() {
+            document.getElementById('fabContainer').classList.toggle('active');
+            const icon = document.querySelector('.fab-main i');
+            if (document.getElementById('fabContainer').classList.contains('active')) {
+                icon.classList.remove('fa-mobile-alt');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-mobile-alt');
+            }
+        }
+    </script>
+
+    <script>
+        // --- Chart 1: Dubbing Supremacy (Bar Chart) ---
+        var optionsDubbing = {
+            series: [{
+                name: 'Average Votes',
+                data: [1683, 145, 89]
+            }],
+            chart: {
+                type: 'bar',
+                height: 300,
+                toolbar: { show: false },
+                background: 'transparent',
+                fontFamily: 'Inter, sans-serif'
+            },
+            plotOptions: {
+                bar: {
+                    borderRadius: 4,
+                    horizontal: true,
+                    distributed: true, // Different colors per bar
+                }
+            },
+            colors: ['#FBBF24', '#94a3b8', '#64748b'], // Gold, Slate-400, Slate-500
+            dataLabels: {
+                enabled: true,
+                textAnchor: 'start',
+                style: { colors: ['#fff'] },
+                formatter: function (val, opt) {
+                    return val.toLocaleString() + " votes";
+                },
+                offsetX: 0,
+            },
+            xaxis: {
+                categories: ['Dubbed', 'Subtitled', 'Original'],
+                labels: { style: { colors: '#94a3b8' } },
+                axisBorder: { show: false },
+                axisTicks: { show: false }
+            },
+            yaxis: {
+                labels: { style: { colors: '#fff', fontSize: '14px', fontWeight: 600 } }
+            },
+            grid: {
+                borderColor: 'rgba(255,255,255,0.05)',
+                xaxis: { lines: { show: true } }
+            },
+            tooltip: {
+                theme: 'dark',
+                y: { title: { formatter: function () { return '' } } }
+            },
+            legend: { show: false }
+        };
+
+        var chartDubbing = new ApexCharts(document.querySelector("#chart-dubbing"), optionsDubbing);
+        chartDubbing.render();
+
+        // --- Chart 2: Taste Gap (Scatter Chart) ---
+        var optionsTaste = {
+            series: [
+                {
+                    name: "Universal Hits",
+                    data: [
+                        [9.0, 9.2, 20] // The Last of Us
+                    ]
+                },
+                {
+                    name: "Local Favorites",
+                    data: [
+                        [8.7, 9.9, 25], // The Mandalorian
+                        [7.6, 9.9, 30], // See
+                        [6.5, 8.0, 10]  // Local Comedy
+                    ]
+                },
+                {
+                    name: "Cultural Mismatch",
+                    data: [
+                        [7.4, 0.3, 12], // 3%
+                        [7.3, 6.8, 15], // Hereditary
+                        [7.0, 6.7, 10], // Smile 2
+                        [4.5, 5.0, 8]   // Patrick Star Show
+                    ]
+                },
+                {
+                    name: "Universal Flops",
+                    data: [
+                        [2.0, 1.5, 25] // Velma
+                    ]
+                }
+            ],
+            chart: {
+                height: 300,
+                type: 'bubble',
+                toolbar: { show: false },
+                background: 'transparent',
+                fontFamily: 'Inter, sans-serif'
+            },
+            dataLabels: { enabled: false },
+            fill: { opacity: 0.8 },
+            colors: ['#4ade80', '#FBBF24', '#F87171', '#64748b'], // Green, Gold, Red, Slate
+            xaxis: {
+                tickAmount: 8,
+                min: 0,
+                max: 11,
+                title: { text: 'Global Rating (IMDb)', style: { color: '#94a3b8' } },
+                labels: { style: { colors: '#94a3b8' } },
+                axisBorder: { show: false },
+                axisTicks: { show: false }
+            },
+            yaxis: {
+                min: 0,
+                max: 11,
+                title: { text: 'Local Rating (Filimo)', style: { color: '#94a3b8' } },
+                labels: { style: { colors: '#94a3b8' } }
+            },
+            grid: {
+                borderColor: 'rgba(255,255,255,0.05)',
+                padding: { top: 20, bottom: 20, left: 20, right: 20 }
+            },
+            tooltip: {
+                theme: 'dark',
+                custom: function({series, seriesIndex, dataPointIndex, w}) {
+                    var data = w.config.series[seriesIndex].data[dataPointIndex];
+                    var names = {
+                        "Universal Hits": "The Last of Us",
+                        "Local Favorites": data[1] === 9.9 ? (data[0] === 8.7 ? "The Mandalorian" : "See") : "Local Comedy",
+                        "Cultural Mismatch": data[1] === 0.3 ? "3%" : (data[1] === 6.8 ? "Hereditary" : "Smile 2"),
+                        "Universal Flops": "Velma"
+                    };
+                    var name = names[w.config.series[seriesIndex].name];
+                    return '<div style="padding: 8px; background: #1e293b; border: 1px solid #334155;">' +
+                        '<span style="color: #fff; font-weight: bold;">' + name + '</span><br>' +
+                        'Global: ' + data[0] + '<br>' +
+                        'Local: ' + data[1] +
+                        '</div>';
+                }
+            },
+            legend: {
+                labels: { colors: '#94a3b8' },
+                markers: { width: 10, height: 10 }
+            }
+        };
+
+        var chartTaste = new ApexCharts(document.querySelector("#chart-taste"), optionsTaste);
+        chartTaste.render();
+
+        // --- Chart 3: Genre Popularity (Scatter/Bubble) ---
+        var optionsGenre = {
+            series: [{
+                name: 'Genres',
+                data: [
+                    [1018009, 9.09, 50], // Action
+                    [589683, 9.10, 40],  // Drama
+                    [535086, 9.11, 35],  // Adventure
+                    [104369, 9.20, 20],  // Fantasy
+                    [83071, 9.32, 15],   // Anime
+                    [69838, 9.24, 15]    // Romance
+                ]
+            }],
+            chart: {
+                height: 350,
+                type: 'scatter',
+                toolbar: { show: false },
+                background: 'transparent',
+                fontFamily: 'Inter, sans-serif'
+            },
+            colors: ['#818cf8'],
+            xaxis: {
+                tickAmount: 5,
+                title: { text: 'Total Votes', style: { color: '#94a3b8' } },
+                labels: { 
+                    style: { colors: '#94a3b8' },
+                    formatter: function(val) { return (val/1000).toFixed(0) + 'k' }
+                },
+                axisBorder: { show: false },
+                axisTicks: { show: false }
+            },
+            yaxis: {
+                min: 8.5,
+                max: 9.6,
+                title: { text: 'Average Rating', style: { color: '#94a3b8' } },
+                labels: { style: { colors: '#94a3b8' } }
+            },
+            grid: {
+                borderColor: 'rgba(255,255,255,0.05)',
+                padding: { top: 20, bottom: 20, left: 20, right: 20 }
+            },
+            tooltip: {
+                theme: 'dark',
+                custom: function({series, seriesIndex, dataPointIndex, w}) {
+                    var data = w.config.series[seriesIndex].data[dataPointIndex];
+                    var genres = ["Action", "Drama", "Adventure", "Fantasy", "Anime", "Romance"];
+                    return '<div style="padding: 8px; background: #1e293b; border: 1px solid #334155;">' +
+                        '<span style="color: #fff; font-weight: bold;">' + genres[dataPointIndex] + '</span><br>' +
+                        'Votes: ' + (data[0]/1000).toFixed(1) + 'k<br>' +
+                        'Rating: ' + data[1] +
+                        '</div>';
+                }
+            }
+        };
+
+        var chartGenre = new ApexCharts(document.querySelector("#chart-genre"), optionsGenre);
+        chartGenre.render();
+
+    </script>
+</body>
+
+</html>
