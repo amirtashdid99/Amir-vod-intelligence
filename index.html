@@ -42,6 +42,7 @@
             color: var(--text-primary);
             line-height: 1.7;
             overflow-x: hidden;
+            width: 100%;
         }
 
         /* --- Navigation --- */
@@ -214,9 +215,10 @@
         /* --- Components --- */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 2rem;
             margin-top: 3rem;
+            width: 100%;
         }
 
         .hero-grid {
@@ -224,6 +226,7 @@
             grid-template-columns: repeat(4, 1fr);
             gap: 1.5rem;
             margin-top: 3rem;
+            width: 100%;
         }
 
         @media (max-width: 1024px) {
@@ -236,6 +239,18 @@
             .hero-grid {
                 grid-template-columns: 1fr;
             }
+            
+            .grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            .span-2 {
+                grid-column: auto !important;
+            }
+        }
+
+        .span-2 {
+            grid-column: span 2;
         }
 
         .card {
@@ -310,12 +325,17 @@
             -webkit-text-fill-color: transparent;
         }
 
-        .metric-label {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
+        .metrics-row {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+        }
+
+        @media (max-width: 600px) {
+            .metrics-row {
+                gap: 1rem;
+                flex-wrap: wrap;
+            }
         }
 
         /* --- Code Window --- */
@@ -328,6 +348,7 @@
             margin: 2rem 0;
             transform: perspective(1000px) rotateY(-2deg);
             transition: transform 0.5s ease;
+            max-width: 100%;
         }
         
         .code-window:hover {
@@ -355,12 +376,15 @@
             margin: 0 !important;
             padding: 1.5rem !important;
             background: transparent !important;
+            overflow-x: auto !important;
+            max-width: 100%;
         }
 
         code {
             font-family: 'JetBrains Mono', monospace !important;
             font-size: 0.9rem !important;
             line-height: 1.6 !important;
+            white-space: pre;
         }
 
         /* --- Tabs --- */
@@ -368,10 +392,13 @@
             background: rgba(255,255,255,0.02);
             border-radius: 16px;
             padding: 0.5rem;
-            display: inline-flex;
+            display: flex;
+            flex-wrap: wrap;
             gap: 0.5rem;
             margin-bottom: 3rem;
             border: var(--glass-border);
+            width: 100%;
+            justify-content: center;
         }
 
         .tab-btn {
@@ -916,7 +943,7 @@ class FilimoScraper(BaseScraper):
             )
             # ... extract URLs</code></pre>
                     </div>
-                    <div style="display: flex; gap: 2rem; justify-content: center;">
+                    <div class="metrics-row">
                         <div style="text-align: center;">
                             <div class="metric">15k+</div>
                             <div class="metric-label">Pages Scraped</div>
@@ -1003,7 +1030,7 @@ class FilimoScraper(BaseScraper):
             </div>
 
             <div id="clean" class="tab-content active stagger-child">
-                <div class="grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="grid">
                     <div>
                         <h4 style="color: #fff; margin-bottom: 1rem;">Data Cleaning & Normalization</h4>
                         <p>Garbage in, garbage out. I spent significant effort ensuring the data was pristine.</p>
@@ -1054,7 +1081,7 @@ df = pd.get_dummies(df, columns=['type'])</code></pre>
             </div>
 
             <div id="ml" class="tab-content stagger-child">
-                <div class="grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="grid">
                     <div>
                         <h4 style="color: #fff; margin-bottom: 1rem;">Unsupervised Learning</h4>
                         <p><strong>Clustering (K-Means):</strong> Grouped content into Blockbusters, Hidden Gems, and Standard Catalog.</p>
@@ -1093,7 +1120,7 @@ df['anomaly'] = iso.fit_predict(features)</code></pre>
                     <p>Shows like <em>3%</em> have massive gaps between Local (<6.0) and Global (>7.0) ratings due to cultural mismatch.</p>
                     <div id="chart-taste" style="min-height: 300px;"></div>
                 </div>
-                <div class="card" style="grid-column: span 2;">
+                <div class="card span-2">
                     <h4 style="color: #fff;">Genre Popularity vs Rating</h4>
                     <p>Action has the volume, but Anime has the quality.</p>
                     <div id="chart-genre" style="min-height: 350px;"></div>
@@ -1101,7 +1128,7 @@ df['anomaly'] = iso.fit_predict(features)</code></pre>
             </div>
 
             <h3 class="stagger-child" style="margin-top: 4rem; text-align: center;">💎 Hidden Gems</h3>
-            <div class="grid stagger-child" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); margin-top: 1rem;">
+            <div class="grid stagger-child" style="margin-top: 1rem;">
                 <div class="card" style="text-align: center;">
                     <h5 style="color: #fff; margin-bottom: 0.5rem;">A Million Little Things</h5>
                     <div class="metric">9.9</div>
@@ -1120,7 +1147,7 @@ df['anomaly'] = iso.fit_predict(features)</code></pre>
             </div>
 
             <h3 class="stagger-child" style="margin-top: 4rem; text-align: center;">📊 Deep Dive Analysis</h3>
-            <div class="grid stagger-child" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin-top: 1rem;">
+            <div class="grid stagger-child" style="margin-top: 1rem;">
                 <!-- Card 1: Anime -->
                 <div class="card">
                     <div class="card-icon" style="color: #F472B6;">🎌</div>
