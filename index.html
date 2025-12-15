@@ -855,12 +855,27 @@
             flex-wrap: wrap;
             justify-content: center;
             gap: 2rem;
+            align-items: stretch;
         }
         
         #techstack .card {
-            flex: 1 1 350px;
+            flex: 1 1 300px;
             max-width: 600px;
-            min-width: 300px;
+            min-width: 280px;
+            height: auto;
+        }
+
+        @media (max-width: 768px) {
+            #techstack .card {
+                flex: 1 1 100%;
+                max-width: 100%;
+                min-width: 0;
+            }
+            
+            #techstack .grid {
+                flex-direction: column;
+                align-items: center;
+            }
         }
     </style>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
