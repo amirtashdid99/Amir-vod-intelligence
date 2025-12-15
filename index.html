@@ -681,6 +681,100 @@
             section { padding: 4rem 0; }
             .fab-container { bottom: 1.5rem; right: 1.5rem; }
         }
+
+        /* --- Mobile Menu --- */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1002; /* Above nav */
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(11, 15, 25, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .mobile-menu.active {
+            transform: translateX(0);
+        }
+
+        .mobile-menu a {
+            color: #fff;
+            font-size: 1.5rem;
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.3s;
+        }
+
+        .mobile-menu a:hover {
+            color: var(--accent-secondary);
+        }
+
+        /* --- Responsive Grids --- */
+        .responsive-grid-2 {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .responsive-grid-reverse {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .responsive-grid-2, .responsive-grid-reverse {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            /* Adjust hero grid for mobile */
+            .hero-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Adjust charts container */
+            .grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            /* Adjust modal content */
+            .modal-content {
+                width: 95%;
+                padding: 1.5rem;
+            }
+            
+            .modal-body table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
     </style>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
@@ -699,7 +793,21 @@
             <a href="#techstack">Engine Room</a>
             <a href="#future">Future</a>
         </div>
+        <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+            <i class="fas fa-bars"></i>
+        </button>
     </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#home" onclick="toggleMobileMenu()">Home</a>
+        <a href="#harvest" onclick="toggleMobileMenu()">Harvest</a>
+        <a href="#warehouse" onclick="toggleMobileMenu()">Warehouse</a>
+        <a href="#refinery" onclick="toggleMobileMenu()">Refinery</a>
+        <a href="#gold" onclick="toggleMobileMenu()">Gold</a>
+        <a href="#techstack" onclick="toggleMobileMenu()">Engine Room</a>
+        <a href="#future" onclick="toggleMobileMenu()">Future</a>
+    </div>
 
     <main>
         <!-- HERO -->
@@ -756,7 +864,7 @@
             <h2 class="stagger-child"><span style="color: var(--accent-secondary);">1.</span> The Harvest</h2>
             <h3 class="stagger-child">In the beginning, there was only HTML...</h3>
             
-            <div class="grid stagger-child" style="grid-template-columns: 1.5fr 1fr; align-items: center;">
+            <div class="grid stagger-child responsive-grid-2">
                 <div>
                     <p>The Iranian VOD landscape is vast, dynamic, and guarded. I needed a strategy that was robust, scalable, and respectful. I deployed an army of scrapers to collect thousands of data points.</p>
                     
@@ -812,7 +920,7 @@ class FilimoScraper(BaseScraper):
             <h2 class="stagger-child"><span style="color: var(--accent-primary);">2.</span> The Warehouse</h2>
             <h3 class="stagger-child" style="color: #38bdf8;">Order from Chaos</h3>
             
-            <div class="grid stagger-child" style="grid-template-columns: 1fr 1.5fr;">
+            <div class="grid stagger-child responsive-grid-reverse">
                 <div>
                     <p>Raw data is messy. To perform serious analysis, I needed a structured, relational home for my data. I chose <span class="highlight-text">SQLite</span> paired with <span class="highlight-text">SQLAlchemy</span>.</p>
                     
@@ -1670,6 +1778,23 @@ df['anomaly'] = iso.fit_predict(features)</code></pre>
             } else {
                 icon.classList.remove('fa-times');
                 icon.classList.add('fa-mobile-alt');
+            }
+        }
+
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const btn = document.querySelector('.mobile-menu-btn i');
+            menu.classList.toggle('active');
+            
+            if (menu.classList.contains('active')) {
+                btn.classList.remove('fa-bars');
+                btn.classList.add('fa-times');
+                document.body.style.overflow = 'hidden';
+            } else {
+                btn.classList.remove('fa-times');
+                btn.classList.add('fa-bars');
+                document.body.style.overflow = 'auto';
             }
         }
     </script>
