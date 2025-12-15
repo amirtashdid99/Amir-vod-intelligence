@@ -741,8 +741,14 @@
             gap: 2rem;
         }
 
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
         @media (max-width: 900px) {
-            .responsive-grid-2, .responsive-grid-reverse {
+            .responsive-grid-2, .responsive-grid-reverse, .stats-grid {
                 grid-template-columns: 1fr !important;
             }
             
@@ -764,6 +770,15 @@
                 grid-template-columns: 1fr !important;
             }
             
+            /* Center text on mobile */
+            section {
+                text-align: center;
+            }
+
+            .grid > div {
+                text-align: center;
+            }
+
             /* Adjust modal content */
             .modal-content {
                 width: 95%;
@@ -926,7 +941,7 @@ class FilimoScraper(BaseScraper):
                     
                     <div class="card" style="margin-top: 2rem; border: 1px solid rgba(255,255,255,0.1);">
                         <h4 style="color: #fff; margin-bottom: 1rem;">Database Inventory</h4>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="stats-grid">
                             <div style="background: rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 8px; text-align: center;">
                                 <div style="font-size: 1.5rem; font-weight: 700; color: #60A5FA;">195k+</div>
                                 <div style="font-size: 0.8rem; color: #94a3b8;">User Reviews</div>
@@ -1362,7 +1377,7 @@ df['anomaly'] = iso.fit_predict(features)</code></pre>
                 <p>I have already built the advanced analytics engines, but due to the static nature of GitHub Pages, I cannot host the live Python backends here.</p>
             </div>
 
-            <div class="grid stagger-child"  style="grid-template-columns: 1fr 1fr;">
+            <div class="grid stagger-child responsive-grid-2">
                 <div class="card">
                     <h4 style="color: #fff;">Predictive Modeling</h4>
                     <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;"><h4 style="color: #fff; margin: 0;">Predictive Modeling</h4><span style="background: rgba(74, 222, 128, 0.1); color: #4ade80; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; border: 1px solid rgba(74, 222, 128, 0.2);">Completed</span></div><p>A Random Forest model that predicts a show's success <em>before</em> it airs. (Running locally)</p>
